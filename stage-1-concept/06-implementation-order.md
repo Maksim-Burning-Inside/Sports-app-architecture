@@ -12,7 +12,7 @@
 gantt
     title Поэтапный план реализации ИТ-инфраструктуры экосистемы
     dateFormat  YYYY-MM-DD
-    axisFormat Неделя %V
+    axisFormat %m.%Y
     todayMarker off
 
     section Этап 1: MVP
