@@ -16,26 +16,34 @@
 Данная схема показывает путь движения потоковых данных от фитнес-устройств через сетевую защиту, буферную очередь брокера и сервисы записи в специализированное хранилище.
 
 ```mermaid
-architecture-beta
-    group cluster_perimeter(cloud) [Сетевой периметр домена]
-        service gateway(server) [IoT Ingestion API Gateway]
-    
-    group cluster_internal(cloud) [Внутренний контур домена]
-        service ing_service(server) [Telemetry Ingestion Service (Stateless)]
-        service broker(queue) [Event Broker Kafka / Топик: raw-telemetry]
-        service writer_service(server) [Telemetry Writer Service (Stateless)]
-        service db_ts(database) [Time-Series СУБД]
-        service cache_local(database) [Локальная SQLite на устройстве]
+graph TD
+    %% Описание стилей для красивого отображения
+    classDef perimeter fill:#fff2cc,stroke:#d6b656,stroke-width:2px;
+    classDef internal fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px;
+    classDef db fill:#e1d5e7,stroke:#b85450,stroke-width:2px;
+    classDef client fill:#f5f5f5,stroke:#666666,stroke-width:2px;
 
-    junction route_network
+    subgraph Клиентский контур
+        A[Локальная база SQLite на устройстве]:::client
+    end
 
-    cache_local:left —> route_network:right
-    route_network:down —> gateway:up
-    gateway:down —> ing_service:up
-    ing_service:right —> broker:left
-    broker:right —> writer_service:left
-    writer_service:down —> db_ts:up
+    subgraph Сетевой периметр домена
+        B[IoT Ingestion API Gateway]:::perimeter
+    end
 
+    subgraph Внутренний контур домена
+        C[Telemetry Ingestion Service Stateless]:::internal
+        D[Event Broker Kafka Топик: raw-telemetry]:::internal
+        E[Telemetry Writer Service Stateless]:::internal
+        F[(Time-Series СУБД)]:::db
+    end
+
+    %% Направление движения потока данных
+    A -->|Беспроводной протокол / Передача логов| B
+    B -->|MQTT / Валидация сессии| C
+    C -->|Асинхронный сброс пакетов| D
+    D -->|Фоновое чтение логов| E
+    E -->|Потоковая запись метрик| F
 ```
 
 #### 1.2. Спецификация компонентов контура
