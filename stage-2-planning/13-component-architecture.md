@@ -35,6 +35,7 @@ architecture-beta
     ing_service:right —> broker:left
     broker:right —> writer_service:left
     writer_service:down —> db_ts:up
+
 ```
 
 #### 1.2. Спецификация компонентов контура
