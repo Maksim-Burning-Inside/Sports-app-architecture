@@ -112,7 +112,6 @@ graph TD
 
     %% Входящий поток из внешнего домена телеметрии
     Домен_Телеметрии -->|Публикация события TrainingCompleted| D1
-
 ```
 
 #### 2.2. Спецификация компонентов контура.
@@ -247,8 +246,7 @@ graph TD
 
 ### 5. Итоговая схема проекта.
 
-```mermaid
-%%{init: {"flowchart": {"htmlLabels": true, "wrappingWidth": 500}, "themeCSS": ".edgeLabel foreignObject { overflow: visible; !important } .edgeLabel span { white-space: normal; !important; display: block; max-width: 500px; }"}}%%
+%%{init: {"flowchart": {"htmlLabels": true, "wrappingWidth": 300}, "themeCSS": ".edgeLabel foreignObject { overflow: visible; !important } .edgeLabel span { white-space: normal; !important; display: block; max-width: 300px; }"}}%%
 graph TD
     %% Настройка цветовых стилей для слоев
     classDef client fill:#f5f5f5,stroke:#666666,stroke-width:2px;
@@ -256,92 +254,102 @@ graph TD
     classDef internal fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px;
     classDef db fill:#e1d5e7,stroke:#b85450,stroke-width:2px;
     classDef queue fill:#f8cecc,stroke:#b85450,stroke-width:2px;
+    classDef external fill:#f5f5f5,stroke:#666666,stroke-width:2px;
 
     %% Слой клиентов
-    subgraph Клиентские приложения
-        A1[Мобильное приложение / Пользователь]:::client
-        A2[Локальная база данных SQLite]:::client
+    subgraph Клиентский контур
+        A1[Мобильное приложение / Смартфон]:::client
+        A2[Локальная база SQLite на устройстве]:::client
     end
 
     %% Сетевой периметр (API Шлюзы)
-    subgraph Сетевой периметр защиты
+    subgraph Сетевой периметр домена
         B1[Edge B2C API Gateway]:::perimeter
         B2[IoT Ingestion API Gateway]:::perimeter
         B3[B2B Partner API Gateway]:::perimeter
+        B4[Test API Contracts Gateway]:::perimeter
     end
 
-    %% Общая шина событий
-    subgraph Асинхронная шина данных Kafka
-        K1[Топик: raw-telemetry]:::queue
-        K2[Топик: TrainingCompleted]:::queue
-        K3[Топик: SocialEvents]:::queue
+    %% Центральный брокер событий
+    subgraph Центральный брокер сообщений Kafka
+        K1[Топик: TrainingCompleted]:::queue
+        K2[Топик: SocialEvents]:::queue
     end
 
     %% Внутренние контуры доменов
     subgraph ДОМЕН ТЕЛЕМЕТРИИ
-        C1[Telemetry Ingestion Service]:::internal
-        C2[Telemetry Writer Service]:::internal
-        D1[(Time-Series СУБД Метрик)]:::db
+        C_T1[Telemetry Ingestion Service Stateless]:::internal
+        C_T2[Telemetry Writer Service Stateless]:::internal
+        F_T1[(Time-Series СУБД)]:::db
     end
 
     subgraph ДОМЕН СОЦИАЛИЗАЦИИ
-        S1[Newsfeed Service]:::internal
-        S2[Graph Relations Service]:::internal
-        S3[Geo-Matching Service]:::internal
-        D2[(Графовая СУБД Подписок)]:::db
-        D3[(Гео-кэш Redis)]:::db
+        S1[Newsfeed Service Stateless]:::internal
+        S2[Graph Relations Service Stateless]:::internal
+        S3[Geo-Matching Service Stateless]:::internal
+        F_S1[(Графовая СУБД Подписок)]:::db
+        F_S2[(Гео-кэш активного поиска Redis)]:::db
     end
 
     subgraph ДОМЕН ГЕЙМИФИКАЦИИ
-        G1[Leaderboard Service]:::internal
-        G2[Achievements & Rewards Service]:::internal
+        G1[Leaderboard Service Stateless]:::internal
+        G2[Achievements & Rewards Service Stateless]:::internal
         G3[AI Coach Agent Module]:::internal
-        D4[(Реляционная СУБД Наград)]:::db
-        D5[(Кэш рейтингов Redis)]:::db
+        F_G1[(Реляционная СУБД Геймификации)]:::db
+        F_G2[(Гео-распределенный кэш Redis)]:::db
     end
 
     subgraph ДОМЕН КОММЕРЦИИ
-        E1[Catalog & Order Service]:::internal
-        E2[Inventory Depreciation Service]:::internal
-        E3[B2B Partner Adapter Service]:::internal
-        D6[(Реляционная СУБД Продаж)]:::db
+        E1[Catalog & Order Service Stateless]:::internal
+        E2[Inventory Depreciation Service Stateless]:::internal
+        E3[B2B Partner Adapter Service Stateless]:::internal
+        F_E1[(Реляционная СУБД Коммерции)]:::db
+    end
+
+    subgraph Внешние сервисы
+        EXT1[Банковский шлюз эквайринга]:::external
+        EXT2[ИТ система службы доставки]:::external
     end
 
     %% Сетевые потоки от клиентов к шлюзам
-    A2 -->|Фоновая выгрузка архивов логов| B2
+    A2 -->|Беспроводной протокол / Передача логов| B2
     A1 -->|HTTP REST / Лента, Поиск, Заказы| B1
-    A1 -->|MQTT / Секундный поток метрик| B2
+    A1 -->|MQTT / Валидация сессии| B2
 
-    %% Потоки внутри домена Телеметрии
-    B2 --> C1
-    C1 --> K1
-    K1 --> C2
-    C2 --> D1
-    C2 -->|Публикация события финиша| K2
+    %% Интеграционные связи Домена Телеметрии
+    B2 --> C_T1
+    C_T1 -->|Асинхронный сброс пакетов| K1
+    K1 -->|Фоновое чтение логов| C_T2
+    C_T2 -->|Потоковая запись метрик| F_T1
+    C_T2 -->|Уведомление других доменов о финише| K1
 
-    %% Потоки внутри домена Социализации
-    B1 --> S1
-    B1 --> S2
-    B1 --> S3
-    S1 --> S2
-    S2 --> D2
-    S3 --> D3
-    S2 --> K3
+    %% Интеграционные связи Домена Социализации
+    B1 -->|HTTP REST / Скроллинг ленты| S1
+    B1 -->|HTTP REST / Вступление в группы| S2
+    B1 -->|HTTP REST / Запуск поиска людей| S3
+    B4 -->|Автоматическая проверка контрактов постов| S1
+    S1 -->|Запрос структуры авторов| S2
+    S2 -->|Прямой обход связей| F_S1
+    S3 -->|Фиксация и выборка гео-данных| F_S2
+    S2 -->|Анонимизация гео-точек / Публикация замаскированных маршрутов| K2
 
-    %% Потоки внутри домена Геймификации
-    B1 --> G1
-    B1 --> G3
-    K2 -->|Фоновое чтение финиша| G2
-    G2 --> D4
-    G2 --> G1
-    G1 --> D5
-    G3 --> D4
+    %% Интеграционные связи Домена Геймификации
+    B1 -->|HTTP REST / Просмотр рейтингов| G1
+    B1 -->|HTTP REST / Запрос планов наставника| G3
+    K1 -->|Асинхронное фоновое чтение финиша| G2
+    G2 -->|Шифрованный канал / Запись наград и монет| F_G1
+    G3 -->|Защищенный TLS-доступ / Чтение зашифрованных анкет КБЖУ| F_G1
+    G2 -->|Триггер обновления результатов марафона| G1
+    G1 -->|Кэширование таблиц лидеров в RAM| F_G2
+    G3 -->|Запрос истории телеметрии для расчетов| F_T1
 
-    %% Потоки внутри домена Коммерции
-    B1 --> E1
-    B3 --> E3
-    E3 --> E1
-    E1 --> D6
-    K2 -->|Фоновое чтение финиша| E2
-    E2 --> E1
-```
+    %% Интеграционные связи Домена Коммерции
+    B1 -->|HTTP REST / Заказы и корзина| E1
+    B3 -->|gRPC / Обновление остатков складов| E3
+    E3 -->|Трансформация контрактов данных| E1
+    K1 -->|Асинхронное чтение логов финиша| E2
+    E2 -->|Триггер критического износа экипировки| E1
+    E1 -->|Шифрованный TLS-канал / Запись финансовых транзакций| F1
+    E1 -->|Проведение и проверка оплаты| EXT1
+    E1 -->|Передача оплаченного заказа на доставку| EXT2
+
