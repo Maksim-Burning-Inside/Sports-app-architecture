@@ -78,6 +78,7 @@ graph TD
     classDef internal fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px;
     classDef db fill:#e1d5e7,stroke:#b85450,stroke-width:2px;
     classDef queue fill:#f8cecc,stroke:#b85450,stroke-width:2px;
+    classDef external fill:#f5f5f5,stroke:#666666,stroke-width:2px;
 
     subgraph Сетевой периметр домена
         B1[Edge B2C API Gateway]:::perimeter
@@ -92,6 +93,11 @@ graph TD
         F1[(Реляционная СУБД Коммерции)]:::db
     end
 
+    subgraph Внешние сервисы
+        E1[Банковский шлюз эквайринга]:::external
+        E2[ИТ система службы доставки]:::external
+    end
+
     %% Взаимодействие компонентов и движение трафика
     B1 -->|HTTP REST / Заказы и корзина| C1
     D1 -->|Асинхронное чтение логов финиша| C2
@@ -99,6 +105,10 @@ graph TD
     B2 -->|gRPC / Обновление остатков складов| C3
     C3 -->|Трансформация контрактов данных| C1
     C1 -->|ACID Транзакции / Финансовый учет| F1
+    
+    %% Новые интеграционные связи с внешним миром
+    C1 -->|Проведение и проверка оплаты| E1
+    C1 -->|Передача оплаченного заказа на доставку| E2
 ```
 
 #### 2.2. Спецификация компонентов контура.
