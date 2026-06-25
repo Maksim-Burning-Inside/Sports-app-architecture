@@ -5,6 +5,7 @@
 ### Выделим основные домены будущего приложения и функциональные требования для них:
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": true, "wrappingWidth": 500}, "themeCSS": ".edgeLabel foreignObject { overflow: visible; !important } .edgeLabel span { white-space: normal; !important; display: block; max-width: 500px; }"}}%%
 graph TD
     classDef domain fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,font-weight:bold;
     classDef commerce fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,font-weight:bold;
