@@ -21,7 +21,7 @@ graph TD
     classDef client fill:#f5f5f5,stroke:#666666,stroke-width:2px;
 
     subgraph Клиентский контур
-        A["Локальная база SQLite на устройстве"]:::client
+        A["`Локальная база SQLite на устройстве`"]:::client
     end
 
     subgraph Сетевой периметр домена
