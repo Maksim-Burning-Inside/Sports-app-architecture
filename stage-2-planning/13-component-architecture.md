@@ -246,6 +246,7 @@ graph TD
 
 ### 5. Итоговая схема проекта.
 
+```mermaid
 %%{init: {"flowchart": {"htmlLabels": true, "wrappingWidth": 300}, "themeCSS": ".edgeLabel foreignObject { overflow: visible; !important } .edgeLabel span { white-space: normal; !important; display: block; max-width: 300px; }"}}%%
 graph TD
     %% Настройка цветовых стилей для слоев
@@ -352,4 +353,4 @@ graph TD
     E1 -->|Шифрованный TLS-канал / Запись финансовых транзакций| F1
     E1 -->|Проведение и проверка оплаты| EXT1
     E1 -->|Передача оплаченного заказа на доставку| EXT2
-
+```
