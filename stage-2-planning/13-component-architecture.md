@@ -13,7 +13,7 @@
 Данная схема показывает путь движения потоковых данных через сетевую защиту, буферную очередь брокера и сервисы записи в специализированное хранилище.
 
 ```mermaid
-%%{init: {"flowchart": {"htmlLabels": true, "wrappingWidth": 120}}}%%
+%%{init: {"flowchart": {"htmlLabels": true, "wrappingWidth": 400}}}%%
 graph TD
     %% Описание стилей для красивого отображения
     classDef perimeter fill:#fff2cc,stroke:#d6b656,stroke-width:2px;
