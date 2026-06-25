@@ -31,10 +31,9 @@ graph TD
 
     subgraph Внутренний контур домена
         C[Telemetry Ingestion Service Stateless]:::internal
-        D[Event Broker Kafka Топик: raw-telemetry]:::internal
+        D[Event Broker Kafka Топик: TrainingCompleted]:::internal
         E[Telemetry Writer Service Stateless]:::internal
         F[(Time-Series СУБД)]:::db
-        G[Event Broker Kafka Топик: TrainingCompleted]:::internal
     end
 
     %% Направление движения потока данных
@@ -43,7 +42,7 @@ graph TD
     C -->|Асинхронный сброс пакетов| D
     D -->|Фоновое чтение логов| E
     E -->|Потоковая запись метрик| F
-    E -->|Уведомление других доменов о финише| G
+    E -->|Уведомление других доменов о финише| D
 ```
 
 #### 1.2. Спецификация компонентов контура
