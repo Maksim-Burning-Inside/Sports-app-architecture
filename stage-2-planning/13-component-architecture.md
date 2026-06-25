@@ -70,6 +70,7 @@ graph TD
 Схема демонстрирует разделение входящего трафика между розничными пользователями и партнерами, а также асинхронную обработку событий износа инвентаря.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": true, "wrappingWidth": 400}}}%%
 graph TD
     %% Описание стилей для красивого отображения
     classDef perimeter fill:#fff2cc,stroke:#d6b656,stroke-width:2px;
@@ -128,6 +129,7 @@ graph TD
 Схема демонстрирует асинхронный прием событий финиша тренировок, кэширование соревновательных рейтингов в оперативной памяти и контекстное подключение ИИ-модуля.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": true, "wrappingWidth": 400}}}%%
 graph TD
     %% Описание стилей для красивого отображения
     classDef perimeter fill:#fff2cc,stroke:#d6b656,stroke-width:2px;
@@ -185,6 +187,7 @@ graph TD
 Схема демонстрирует параллельное использование графовой СУБД для обхода связей и быстрой памяти Redis для мгновенного сопоставления гео-координат.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": true, "wrappingWidth": 400}}}%%
 graph TD
     %% Описание стилей для красивого отображения
     classDef perimeter fill:#fff2cc,stroke:#d6b656,stroke-width:2px;
@@ -236,6 +239,7 @@ graph TD
 ### 5. Итоговая схема проекта.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": true, "wrappingWidth": 400}}}%%
 graph TD
     %% Настройка цветовых стилей для слоев
     classDef client fill:#f5f5f5,stroke:#666666,stroke-width:2px;
